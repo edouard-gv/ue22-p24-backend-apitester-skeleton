@@ -1,9 +1,8 @@
 import pathlib as pl
 
-import numpy as np
 import pandas as pd
 
-from flask import Flask, jsonify, request
+from flask import Flask
 from flask_cors import CORS
 
 
@@ -24,20 +23,23 @@ def is_alive():
 
 @app.route("/api/associations", methods=["GET"])
 def associations():
-    return associations_df["id"].transpose().to_list()
+    return list(associations_df)
+    # return associations_df["id"].transpose().to_list()
 
 
 @app.route("/api/association/<int:id>", methods=["GET"])
 def association(id):
     if id in associations_df.id:
-        return associations_df[associations_df.id == id].transpose()[0].to_json()
+        return associations_df[associations_df.id == id].iloc[0].to_dict()
+        # return associations_df[associations_df.id == id].transpose()[0].to_json()
     else:
         return {"error": "Association not found"}, 404
 
 
 @app.route("/api/evenements", methods=["GET"])
 def evenements():
-    return evenements_df["id"].transpose().to_list()
+    return list(evenements_df.id)
+    # return evenements_df["id"].transpose().to_list()
 
 
 @app.route("/api/evenement/<int:id>", methods=["GET"])
@@ -51,12 +53,15 @@ def evenement(id):
 @app.route("/api/association/<int:id>/evenements", methods=["GET"])
 def association_evenements(id):
     if id in associations_df.id:
-        return list(
-            evenements_df[evenements_df.association_id == id]
-            .transpose()
-            .to_dict()
-            .values()
+        return evenements_df[evenements_df.association_id == id].to_dict(
+            orient="records"
         )
+        # return list(
+        #     evenements_df[evenements_df.association_id == id]
+        #     .transpose()
+        #     .to_dict()
+        #     .values()
+        # )
     else:
         return {"error": "Association not found"}, 404
 
