@@ -29,7 +29,10 @@ def associations():
 
 @app.route("/api/association/<int:id>", methods=["GET"])
 def association(id):
-    return associations_df[associations_df.id == id].transpose()[0].to_json()
+    if id in associations_df.id:
+        return associations_df[associations_df.id == id].transpose()[0].to_json()
+    else:
+        return {"error": "Association not found"}, 404
 
 
 @app.route("/api/evenements", methods=["GET"])
@@ -39,14 +42,23 @@ def evenements():
 
 @app.route("/api/evenement/<int:id>", methods=["GET"])
 def evenement(id):
-    return evenements_df[evenements_df.id == id].transpose()[0].to_json()
+    if id in evenements_df.id:
+        return evenements_df[evenements_df.id == id].transpose()[0].to_json()
+    else:
+        return {"error": "Event not found"}, 404
 
 
 @app.route("/api/association/<int:id>/evenements", methods=["GET"])
 def association_evenements(id):
-    return list(
-        evenements_df[evenements_df.association_id == id].transpose().to_dict().values()
-    )
+    if id in associations_df.id:
+        return list(
+            evenements_df[evenements_df.association_id == id]
+            .transpose()
+            .to_dict()
+            .values()
+        )
+    else:
+        return {"error": "Association not found"}, 404
 
 
 @app.route("/api/association/type/<type>", methods=["GET"])
